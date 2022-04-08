@@ -1,51 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+enum PhotoSource { ASSET, NETWORK }
+enum PhotoStatus { LOADING, ERROR, LOADED }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+void main() => runApp(CisAppAWS());
 
-  // This widget is the root of your application.
+class CisAppAWS extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
+  late PhotoSource photoSource;
+  late PhotoStatus photoStatus;
+  late String source;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('widget.title'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '_counter',
-            ),
-          ],
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 24),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                height: 200,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.grey.shade200,
+                        child: photoSource == PhotoSource.NETWORK
+                            ? Image.network(source, height: 200)
+                            : photoSource == PhotoSource.ASSET
+                                ? Image.asset(source, height: 200)
+                                : Container(
+                                    color: Colors.grey.shade200, height: 200),
+                      ),
+                    ),
+                    Center(
+                      child: photoStatus == PhotoStatus.LOADING
+                          ? CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation(Colors.red))
+                          : photoStatus == PhotoStatus.ERROR
+                              ? Icon(MaterialIcons.error,
+                                  color: Colors.red, size: 40)
+                              : Container(),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+              RaisedButton(
+                onPressed: () async {},
+                child: Text('Select image'),
+              )
+            ],
+          ),
         ),
       ),
     );
